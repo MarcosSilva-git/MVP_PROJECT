@@ -11,8 +11,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 builder.Services.AddScoped<HelpDeskContext>();
-
 builder.Services.AddHelpDeskServices();
+builder.Services.ImplementarSwagger();
 
 var app = builder.Build();
 
@@ -28,8 +28,9 @@ else
     app.UseHsts();
 }
 
-
 app.UseHttpsRedirection();
+
+app.UsarSwagger();
 
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
