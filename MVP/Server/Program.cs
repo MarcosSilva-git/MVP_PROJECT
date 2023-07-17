@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using MVP.Infra.Context;
 using MVP.Server.Configs;
 using MVP.Shared.Services;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,12 +15,15 @@ builder.Services.AddScoped<HelpDeskContext>();
 builder.Services.AddHelpDeskServices();
 builder.Services.ImplementarSwagger();
 
+builder.AddHelpDeskSerilog();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseWebAssemblyDebugging();
+    app.UsarSwagger();
 }
 else
 {
@@ -29,8 +33,6 @@ else
 }
 
 app.UseHttpsRedirection();
-
-app.UsarSwagger();
 
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
