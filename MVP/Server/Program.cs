@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.ResponseCompression;
 using MVP.Infra.Context;
+using MVP.Server.Configs;
+using MVP.Shared.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 builder.Services.AddScoped<HelpDeskContext>();
+
+builder.Services.AddHelpDeskServices();
 
 var app = builder.Build();
 

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using MVP.Infra.Context;
 using MVP.Server.Controllers.Generics;
 using MVP.Shared;
+using MVP.Shared.Services;
 
 namespace MVP.Server.Controllers
 {
@@ -13,10 +14,15 @@ namespace MVP.Server.Controllers
     };
 
         private readonly ILogger<WeatherForecastController> _logger;
+        private readonly UserService UserService;
 
-        public WeatherForecastController(HelpDeskContext helpDeskContext, ILogger<WeatherForecastController> logger) : base(helpDeskContext)
+        public WeatherForecastController(
+            HelpDeskContext helpDeskContext,
+            UserService userService,
+            ILogger<WeatherForecastController> logger) : base(helpDeskContext)
         {
             _logger = logger;
+            UserService = userService;
         }
 
         [HttpGet]
@@ -30,5 +36,9 @@ namespace MVP.Server.Controllers
             })
             .ToArray();
         }
+
+        [HttpGet("GetUser")]
+        public string GetUser()
+            => UserService.GetUserName();
     }
 }
