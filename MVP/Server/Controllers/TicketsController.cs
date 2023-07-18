@@ -2,7 +2,7 @@
 using MVP.Infra.Context;
 using MVP.Infra.Entities;
 using MVP.Server.Controllers.Generics;
-using MVP.Shared.DTOs.Tickets;
+using MVP.Shared.DTOs;
 using MVP.Shared.Services;
 
 namespace MVP.Server.Controllers;

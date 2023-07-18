@@ -1,8 +1,7 @@
-﻿<!-- Index.cshtml -->
-@page "/"
+﻿@page "/"
 @using MVP.Client.Shared.Components
 @using MVP.Infra.Enums
-@using MVP.Shared.DTOs.Tickets
+@using MVP.Shared.DTOs
 @using System.Linq
 
 <PageTitle>HelpDesk</PageTitle>
@@ -30,6 +29,7 @@ else if (Tickets is not null)
                 <th class="text-center">Title</th>
                 <th class="text-center">Description</th>
                 <th class="text-center">Status</th>
+                <th class="text-center">Opening Date</th>
                 <th class="text-center">Options</th>
             </tr>
         </thead>
@@ -37,13 +37,14 @@ else if (Tickets is not null)
             @foreach (var ticket in Tickets.OrderByDescending(t => t.Id))
             {
                 <tr>
-                    <td class="text-center">@ticket.Id</td>
-                    <td class="text-center">@ticket.Title</td>
-                    <td class="text-center">@ticket.Description</td>
-                    <td class="text-center">@ticket.StatusName</td>
-                    <td class="text-center">
-                        <button class="btn btn-danger" @onclick="() => DeleteTicket(ticket.Id)">Delete</button>
-                        <button class="btn btn-primary" @onclick="() => ShowEditModal(ticket)">Edit</button>
+                    <td class="text-center align-middle">@ticket.Id</td>
+                    <td class="text-center align-middle">@ticket.Title</td>
+                    <td class="text-center align-middle">@ticket.Description</td>
+                    <td class="text-center align-middle">@ticket.StatusName</td>
+                    <td class="text-center align-middle">@ticket.OpeningDate.ToString("d")</td>
+                    <td class="text-center align-middle">
+                        <button class="btn btn-outline-primary" @onclick="() => ShowEditModal(ticket)">Edit</button>
+                        <button class="btn btn-outline-danger" @onclick="() => DeleteTicket(ticket.Id)">Delete</button>
                     </td>
                 </tr>
             }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MVP.Infra.Context;
 using MVP.Infra.Entities;
-using MVP.Shared.DTOs.Tickets;
+using MVP.Shared.DTOs;
 using MVP.Shared.Services.Generics;
 using System.Runtime.InteropServices;
 
