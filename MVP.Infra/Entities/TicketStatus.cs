@@ -2,7 +2,18 @@
 
 namespace MVP.Infra.Entities;
 
-public class TicketStatus : BaseEntity
+public class TicketStatus
 {
+    public int Id { get; set; }
     public required TicketStatusEnum Name { get; set; }
+
+    public static TicketStatus[] InitialValues()
+    {
+        return new TicketStatus[]
+        {
+            new TicketStatus() { Id = 1, Name = TicketStatusEnum.Closed },
+            new TicketStatus() { Id = 2, Name = TicketStatusEnum.Open },
+            new TicketStatus() { Id = 3, Name = TicketStatusEnum.Pending }
+        };
+    }
 }

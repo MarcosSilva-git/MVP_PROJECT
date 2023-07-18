@@ -2,7 +2,7 @@
 
 public enum TicketStatusEnum
 {
-    Closed,
+    Closed = 1,
     Open,
     Pending,
 }

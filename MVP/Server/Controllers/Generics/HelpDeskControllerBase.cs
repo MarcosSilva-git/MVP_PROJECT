@@ -7,7 +7,7 @@ namespace MVP.Server.Controllers.Generics
     [Route("api/[controller]")]
     public class HelpDeskControllerBase : ControllerBase
     {
-        HelpDeskContext HelpDeskContext { get; }
+        protected HelpDeskContext HelpDeskContext { get; }
 
         public HelpDeskControllerBase(HelpDeskContext helpDeskContext) 
         {

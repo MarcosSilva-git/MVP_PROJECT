@@ -37,7 +37,7 @@ namespace MVP.Infra.Migrations
 
                     b.HasIndex("StatusId");
 
-                    b.ToTable("Tickets");
+                    b.ToTable("Tickets", (string)null);
                 });
 
             modelBuilder.Entity("MVP.Infra.Entities.TicketStatus", b =>
@@ -52,7 +52,7 @@ namespace MVP.Infra.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TicketStatus");
+                    b.ToTable("TicketStatus", (string)null);
 
                     b.HasData(
                         new
