@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Mvc;
 using MVP.Infra.Context;
 using MVP.Infra.Entities;
 using MVP.Server.Controllers.Generics;
-using MVP.Shared.DTOs.Tickets;
+using MVP.Shared.DTOs;
 using MVP.Shared.Services;
+using System.IO;
 
 namespace MVP.Server.Controllers;
 
@@ -70,5 +73,48 @@ public class TicketsController : HelpDeskControllerBase
             _logger.LogInformation(e.Message);
             return BadRequest(e.Message);
         }
+    }
+
+    [HttpPost("ExportToExcel")]
+    public FileResult ExportToExcel(List<TicketDTO> tickets)
+    {
+        var excelWorkBook = new XLWorkbook();
+        var sheet = excelWorkBook.Worksheets.Add("Data");
+
+        var row = 1;
+        foreach (var ticket in tickets)
+        {
+            if (ticket == tickets[0])
+            {
+                sheet.Cell(row, 1).Value = "Id";
+                sheet.Cell(row, 2).Value = "Title";
+                sheet.Cell(row, 3).Value = "Description";
+                sheet.Cell(row, 4).Value = "Status Id";
+                sheet.Cell(row, 5).Value = "Status Name";
+                sheet.Cell(row, 6).Value = "Opening Date";
+
+                row++;
+            }
+
+            sheet.Cell(row, 1).Value = ticket.Id;
+            sheet.Cell(row, 2).Value = ticket.Title;
+            sheet.Cell(row, 3).Value = ticket.Description;
+            sheet.Cell(row, 4).Value = ticket.StatusId;
+            sheet.Cell(row, 5).Value = ticket.StatusName;
+            sheet.Cell(row, 6).Value = ticket.OpeningDate.ToString("d");
+
+            row++;
+        }
+
+        var firstRow = sheet.FirstRowUsed();
+
+        firstRow.Style.Font.Bold = true;
+        firstRow.Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
+        sheet.Columns().AdjustToContents();
+
+        var stream = new MemoryStream();
+        excelWorkBook.SaveAs(stream);
+
+        return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", string.Empty);
     }
 }

@@ -1,9 +1,8 @@
 ﻿using MVP.Infra.Entities;
 using MVP.Infra.Enums;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices;
 
-namespace MVP.Shared.DTOs.Tickets;
+namespace MVP.Shared.DTOs;
 
 public class TicketDTO
 {
@@ -12,9 +11,10 @@ public class TicketDTO
     public TicketDTO(Ticket ticket)
     {
         Id = ticket.Id;
-        Title = ticket.Title;
-        Description = ticket.Description;
+        Title = ticket.Title ?? "";
+        Description = ticket.Description ?? "";
         StatusId = ticket.StatusId;
+        OpeningDate = ticket.OpeningDate;
     }
 
     public int Id { get; set; }
@@ -30,4 +30,5 @@ public class TicketDTO
     [Required(ErrorMessage = "*Campo obrigatório")]
     public int StatusId { get; set; }
     public string StatusName { get => ((TicketStatusEnum)StatusId).ToString(); }
+    public DateTime OpeningDate { get; set; }
 }

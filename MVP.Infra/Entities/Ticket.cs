@@ -11,4 +11,5 @@ public class Ticket
     [ForeignKey("TicketStatus")]
     public int StatusId { get; set; }
     public TicketStatus? Status { get; set; }
+    public DateTime OpeningDate { get; set; } = DateTime.Now;
 }

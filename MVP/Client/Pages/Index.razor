@@ -1,15 +1,20 @@
-﻿<!-- Index.cshtml -->
-@page "/"
+﻿@page "/"
 @using MVP.Client.Shared.Components
 @using MVP.Infra.Enums
-@using MVP.Shared.DTOs.Tickets
+@using MVP.Shared.DTOs
 @using System.Linq
+
+@inject IJSRuntime JS
 
 <PageTitle>HelpDesk</PageTitle>
 
 <h1 class="text-center my-2">HelpDesk</h1>
 
 <div class="d-flex justify-content-end">
+    <button class="btn btn-success me-2" @onclick="ExportToExcel"
+            disabled="@(Tickets is null || Tickets?.Count == 0)">
+        Export to Excel
+    </button>
     <button class="btn btn-primary" @onclick="ShowCreateTicketModal">Add Ticket</button>
 </div>
 
@@ -23,13 +28,14 @@ else if (Tickets?.Count == 0)
 }
 else if (Tickets is not null)
 {
-    <table class="table">
+    <table class="table mt-4">
         <thead>
             <tr>
                 <th class="text-center">ID</th>
                 <th class="text-center">Title</th>
                 <th class="text-center">Description</th>
                 <th class="text-center">Status</th>
+                <th class="text-center">Opening Date</th>
                 <th class="text-center">Options</th>
             </tr>
         </thead>
@@ -37,13 +43,14 @@ else if (Tickets is not null)
             @foreach (var ticket in Tickets.OrderByDescending(t => t.Id))
             {
                 <tr>
-                    <td class="text-center">@ticket.Id</td>
-                    <td class="text-center">@ticket.Title</td>
-                    <td class="text-center">@ticket.Description</td>
-                    <td class="text-center">@ticket.StatusName</td>
-                    <td class="text-center">
-                        <button class="btn btn-danger" @onclick="() => DeleteTicket(ticket.Id)">Delete</button>
-                        <button class="btn btn-primary" @onclick="() => ShowEditModal(ticket)">Edit</button>
+                    <td class="text-center align-middle">@ticket.Id</td>
+                    <td class="text-center align-middle">@ticket.Title</td>
+                    <td class="text-center align-middle">@ticket.Description</td>
+                    <td class="text-center align-middle">@ticket.StatusName</td>
+                    <td class="text-center align-middle">@ticket.OpeningDate.ToString("d")</td>
+                    <td class="text-center align-middle">
+                        <button class="btn btn-outline-primary" @onclick="() => ShowEditModal(ticket)">Edit</button>
+                        <button class="btn btn-outline-danger" @onclick="() => DeleteTicket(ticket.Id)">Delete</button>
                     </td>
                 </tr>
             }
@@ -124,5 +131,19 @@ else if (Tickets is not null)
         }
 
         await InvokeAsync(StateHasChanged);
+    }
+
+    async Task ExportToExcel()
+    {
+        var request = await HelpDeskHttp.PostAsJsonAsync<List<TicketDTO>>("api/Tickets/ExportToExcel", Tickets);
+
+        if (request.IsSuccessStatusCode)
+        {
+            var response = await request.Content.ReadAsStreamAsync();
+
+            var streamRef = new DotNetStreamReference(stream: response);
+
+            await JS.InvokeVoidAsync("downloadFileFromStream", "Tickets.xlsx", streamRef);
+        }
     }
 }
