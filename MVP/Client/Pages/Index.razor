@@ -7,7 +7,11 @@
 
 <PageTitle>HelpDesk</PageTitle>
 
-<h1>HelpDesk</h1>
+<h1 class="text-center my-2">HelpDesk</h1>
+
+<div class="d-flex justify-content-end">
+    <button class="btn btn-primary" @onclick="ShowCreateTicketModal">Add Ticket</button>
+</div>
 
 @if (IsLoading)
 {
@@ -15,29 +19,29 @@
 }
 else if (Tickets?.Count == 0)
 {
-    <p class="text-danger">No tickets found.</p>
+    <p class="text-danger fs-4">Click in "Add Ticket" to add a new one.</p>
 }
 else if (Tickets is not null)
 {
     <table class="table">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Status</th>
-                <th>Options</th>
+                <th class="text-center">ID</th>
+                <th class="text-center">Title</th>
+                <th class="text-center">Description</th>
+                <th class="text-center">Status</th>
+                <th class="text-center">Options</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var ticket in Tickets.OrderByDescending(t => t.Id))
             {
                 <tr>
-                    <td>@ticket.Id</td>
-                    <td>@ticket.Title</td>
-                    <td>@ticket.Description</td>
-                    <td>@ticket.StatusName</td>
-                    <td>
+                    <td class="text-center">@ticket.Id</td>
+                    <td class="text-center">@ticket.Title</td>
+                    <td class="text-center">@ticket.Description</td>
+                    <td class="text-center">@ticket.StatusName</td>
+                    <td class="text-center">
                         <button class="btn btn-danger" @onclick="() => DeleteTicket(ticket.Id)">Delete</button>
                         <button class="btn btn-primary" @onclick="() => ShowEditModal(ticket)">Edit</button>
                     </td>
@@ -46,8 +50,6 @@ else if (Tickets is not null)
         </tbody>
     </table>
 }
-
-<button class="btn btn-primary" @onclick="ShowCreateTicketModal">Add Ticket</button>
 
 <TicketModal @bind-IsVisible="IsCreateModalVisible" OnTicketCreated="HandleTicketCreated" Ticket=@TicketSelected />
 
@@ -69,7 +71,10 @@ else if (Tickets is not null)
 
     void ShowCreateTicketModal()
     {
-        TicketSelected = new();
+        TicketSelected = new()
+            {
+                StatusId = (int)TicketStatusEnum.Open
+            };
         IsCreateModalVisible = true;
     }
 
@@ -113,7 +118,7 @@ else if (Tickets is not null)
             }
             else
                 Tickets.Add(response);
-                
+
 
             IsCreateModalVisible = false;
         }
