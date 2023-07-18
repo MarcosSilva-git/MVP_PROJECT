@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
 using MVP.Infra.Context;
 using MVP.Server.Configs;
 using MVP.Shared.Services;
@@ -7,11 +8,14 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var sqliteConnectionString = builder.Configuration["DataBase:SqliteConnectionString"];
+
+builder.Services.AddDbContext<HelpDeskContext>(context => context.UseSqlite(sqliteConnectionString));
+
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-builder.Services.AddScoped<HelpDeskContext>();
 builder.Services.AddHelpDeskServices();
 builder.Services.ImplementarSwagger();
 

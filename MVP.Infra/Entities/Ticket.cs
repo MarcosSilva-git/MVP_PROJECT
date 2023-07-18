@@ -2,8 +2,9 @@
 
 namespace MVP.Infra.Entities;
 
-public class Ticket : BaseEntity
+public class Ticket
 {
+    public int Id { get; set; }
     public required string Title { get; set; }
     public required string Description { get; set; }
 
