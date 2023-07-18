@@ -27,29 +27,19 @@ public class TicketsController : HelpDeskControllerBase
         return Ok(tickets.Select(t => new TicketDTO(t)));
     }
 
-    [HttpGet("TicketStatus")]
-    public OkObjectResult TicketStatus()
-    {
-        var ticketStatus = HelpDeskContext.TicketStatus
-            .Select(ts => new { ts.Id, Name = ts.Name.ToString() })
-            .ToArray();
-
-        return Ok(ticketStatus);
-    }
-
-    [HttpPost]
+    [HttpPost("Create")]
     public ActionResult<TicketDTO> Create(TicketDTO ticket)
     {
         var newTicket = TicketService.CreateNewTicket(ticket);
         return Ok(new TicketDTO(newTicket));
     }
 
-    [HttpPut]
-    public ActionResult<TicketDTO> Update(TicketDTO ticket)
+    [HttpPut("Update")]
+    public async Task<ActionResult<TicketDTO>> Update(TicketDTO ticket)
     {
         try
         {
-            var updatedTicket = TicketService.UpdateTicket(ticket);
+            var updatedTicket = await TicketService.UpdateTicket(ticket);
             return Ok(new TicketDTO(updatedTicket));
         }
         catch (KeyNotFoundException e)
@@ -59,7 +49,7 @@ public class TicketsController : HelpDeskControllerBase
         }
     }
 
-    [HttpDelete]
+    [HttpDelete("{id}")]
     public ActionResult<TicketDTO> Delete(int id)
     {
         try

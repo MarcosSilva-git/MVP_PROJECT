@@ -3,7 +3,7 @@ using MVP.Infra.Context;
 using MVP.Infra.Entities;
 using MVP.Shared.DTOs.Tickets;
 using MVP.Shared.Services.Generics;
-using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices;
 
 namespace MVP.Shared.Services;
 
@@ -42,23 +42,23 @@ public class TicketService : IHelpDeskService
             Description = ticket.Description,
         };
 
-        HelpDeskContext.Tickets.Add(newTicket);
+        var addedTicket = HelpDeskContext.Tickets.Add(newTicket).Entity;
         HelpDeskContext.SaveChanges();
 
-        return newTicket;
+        return addedTicket;
     }
 
     public Ticket DeleteTicket(int id)
     {
         var ticket = GetTicketById(id);
 
-        var deletedTicket = HelpDeskContext.Tickets.Remove(ticket).Entity;
+        HelpDeskContext.Tickets.Remove(ticket);
         HelpDeskContext.SaveChanges();
 
-        return deletedTicket;
+        return ticket;
     }
 
-    public Ticket UpdateTicket(TicketDTO ticket)
+    public async Task<Ticket> UpdateTicket(TicketDTO ticket)
     {
         var findedTicket = GetTicketById(ticket.Id);
 
@@ -66,7 +66,6 @@ public class TicketService : IHelpDeskService
         findedTicket.Description = ticket.Description;
         findedTicket.StatusId = ticket.StatusId;
 
-        HelpDeskContext.Tickets.Update(findedTicket);
         HelpDeskContext.SaveChanges();
 
         return findedTicket;
