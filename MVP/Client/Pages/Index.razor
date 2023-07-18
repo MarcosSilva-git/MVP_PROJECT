@@ -1,8 +1,123 @@
-﻿@page "/"
+﻿<!-- Index.cshtml -->
+@page "/"
+@using MVP.Client.Shared.Components
+@using MVP.Infra.Enums
+@using MVP.Shared.DTOs.Tickets
+@using System.Linq
 
-<PageTitle>Index</PageTitle>
+<PageTitle>HelpDesk</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>HelpDesk</h1>
 
-Welcome to your new app.
+@if (IsLoading)
+{
+    <p>Loading...</p>
+}
+else if (Tickets?.Count == 0)
+{
+    <p class="text-danger">No tickets found.</p>
+}
+else if (Tickets is not null)
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Options</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var ticket in Tickets.OrderByDescending(t => t.Id))
+            {
+                <tr>
+                    <td>@ticket.Id</td>
+                    <td>@ticket.Title</td>
+                    <td>@ticket.Description</td>
+                    <td>@ticket.StatusName</td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="() => DeleteTicket(ticket.Id)">Delete</button>
+                        <button class="btn btn-primary" @onclick="() => ShowEditModal(ticket)">Edit</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
+<button class="btn btn-primary" @onclick="ShowCreateTicketModal">Add Ticket</button>
+
+<TicketModal @bind-IsVisible="IsCreateModalVisible" OnTicketCreated="HandleTicketCreated" Ticket=@TicketSelected />
+
+@code {
+    List<TicketDTO> Tickets { get; set; }
+    TicketDTO TicketSelected { get; set; } = new TicketDTO();
+    bool IsLoading { get; set; }
+    bool IsCreateModalVisible { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsLoading = true;
+
+        var tickets = await HelpDeskHttp.GetFromJsonAsync<List<TicketDTO>>("api/Tickets/GetAllTickets");
+        Tickets = tickets;
+
+        IsLoading = false;
+    }
+
+    void ShowCreateTicketModal()
+    {
+        TicketSelected = new();
+        IsCreateModalVisible = true;
+    }
+
+    async Task DeleteTicket(int ticketId)
+    {
+        var request = await HelpDeskHttp.DeleteFromJsonAsync<TicketDTO>($"api/Tickets/{ticketId}");
+
+        if (request is not null)
+        {
+            var ticket = Tickets.First(t => t.Id == ticketId);
+            Tickets.Remove(ticket);
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    void ShowEditModal(TicketDTO ticket)
+    {
+        TicketSelected = ticket;
+        IsCreateModalVisible = true;
+    }
+
+    async void HandleTicketCreated(TicketDTO createdTicket)
+    {
+        HttpResponseMessage request;
+
+        if (TicketSelected.Id == 0)
+            request = await HelpDeskHttp.PostAsJsonAsync<TicketDTO>("api/Tickets/Create", createdTicket);
+        else
+            request = await HelpDeskHttp.PutAsJsonAsync<TicketDTO>("api/Tickets/Update", TicketSelected);
+
+        if (request.IsSuccessStatusCode)
+        {
+            var response = await request.Content.ReadFromJsonAsync<TicketDTO>();
+            var findedTicket = Tickets.Where(t => t.Id == response?.Id).FirstOrDefault();
+
+            if (findedTicket is not null)
+            {
+                Tickets.Remove(findedTicket);
+                Tickets.Add(response);
+            }
+            else
+                Tickets.Add(response);
+                
+
+            IsCreateModalVisible = false;
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+}
