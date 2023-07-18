@@ -5,7 +5,7 @@ namespace MVP.Infra.Entities;
 public class TicketStatus
 {
     public int Id { get; set; }
-    public required TicketStatusEnum Name { get; set; }
+    public TicketStatusEnum Name { get; set; }
 
     public static TicketStatus[] InitialValues()
     {
