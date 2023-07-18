@@ -13,7 +13,8 @@ public class TicketStatus
         {
             new TicketStatus() { Id = 1, Name = TicketStatusEnum.Closed },
             new TicketStatus() { Id = 2, Name = TicketStatusEnum.Open },
-            new TicketStatus() { Id = 3, Name = TicketStatusEnum.Pending }
+            new TicketStatus() { Id = 3, Name = TicketStatusEnum.Pending },
+            new TicketStatus() { Id = 4, Name = TicketStatusEnum.Processing }
         };
     }
 }

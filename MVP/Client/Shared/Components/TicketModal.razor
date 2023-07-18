@@ -1,4 +1,5 @@
-﻿@using MVP.Infra.Enums;
+﻿@using MVP.Infra.Entities;
+@using MVP.Infra.Enums;
 @using MVP.Shared.DTOs.Tickets;
 <!-- CreateTicketModal.razor -->
 <div class="modal fade @(IsVisible ? "show" : "")" style="display: @(IsVisible ? "block" : "none")">
@@ -19,13 +20,34 @@
                         <InputText @bind-Value="@Ticket.Title" class="form-control" />
                         <ValidationMessage For="@(() => Ticket.Title)" />
                     </div>
-                    <div class="form-group">
+                    <div class="form-group mt-2">
                         <label>Description</label>
                         <InputTextArea @bind-Value="@Ticket.Description" class="form-control" />
                         <ValidationMessage For="@(() => Ticket.Description)" />
                     </div>
 
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <div class="form-group mt-3">
+                        <InputSelect @bind-Value="@Ticket.StatusId" class="btn btn-secondary w-100">
+                            @foreach (var status in TicketStatus)
+                            {
+                                <option value="@status.Id">@((TicketStatusEnum)status.Id)</option>
+                            }
+                            <ValidationMessage For="@(() => Ticket.StatusId)" />
+                        </InputSelect>
+
+                    </div>
+
+                    <div class="form-group d-flex mt-3">
+                        @if (IsNewTicket)
+                        {
+                            <button type="submit" class="btn btn-success w-100">Add Ticket</button>
+                        }
+                        else
+                        {
+                            <button type="button" @onclick="HideModal" class="btn btn-outline-danger w-50 me-2">Cancel</button>
+                            <button type="submit" class="btn btn-success w-50 mw-2">Save Changes</button>
+                        }
+                    </div>
                 </EditForm>
             </div>
         </div>
@@ -46,7 +68,17 @@
     [Parameter]
     public TicketDTO Ticket { get; set; } = new TicketDTO();
 
-    string ModalTitle => Ticket.Id == 0 ? "Add Ticket" : "Edit Ticket";
+    public List<TicketStatus> TicketStatus { get; set; } = new();
+
+    bool IsNewTicket => Ticket.Id == 0;
+    string ModalTitle => IsNewTicket ? "Add Ticket" : "Edit Ticket";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var request = await HelpDeskHttp.GetFromJsonAsync<List<TicketStatus>>("api/Tickets/TicketStatus");
+
+        TicketStatus = request;
+    }
 
     void HideModal()
     {
@@ -55,8 +87,6 @@
 
     async Task CreateTicket()
     {
-        Ticket.StatusId = (int)TicketStatusEnum.Pending;
-
         await OnTicketCreated.InvokeAsync(Ticket);
     }
 }

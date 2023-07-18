@@ -19,14 +19,15 @@ public class TicketDTO
 
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "Campo obrigatório.")]
+    [Required(ErrorMessage = "*Campo obrigatório.")]
     [StringLength(250, ErrorMessage = "O título não pode ultrapassar 250 caracteres.")]
     public string Title { get; set; }
 
-    [Required(ErrorMessage = "Campo obrigatório.")]
+    [Required(ErrorMessage = "*Campo obrigatório.")]
     [StringLength(250, ErrorMessage = "A Descrição não pode ultrapassar 250 caracteres.")]
     public string Description { get; set; }
 
+    [Required(ErrorMessage = "*Campo obrigatório")]
     public int StatusId { get; set; }
     public string StatusName { get => ((TicketStatusEnum)StatusId).ToString(); }
 }

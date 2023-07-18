@@ -27,6 +27,14 @@ public class TicketsController : HelpDeskControllerBase
         return Ok(tickets.Select(t => new TicketDTO(t)));
     }
 
+    [HttpGet("TicketStatus")]
+    public OkObjectResult TicketStatus()
+    {
+        var ticketStatus = HelpDeskContext.TicketStatus.ToArray();
+
+        return Ok(ticketStatus);
+    }
+
     [HttpPost("Create")]
     public ActionResult<TicketDTO> Create(TicketDTO ticket)
     {
