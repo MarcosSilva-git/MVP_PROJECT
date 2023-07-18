@@ -4,11 +4,17 @@
 @using MVP.Shared.DTOs
 @using System.Linq
 
+@inject IJSRuntime JS
+
 <PageTitle>HelpDesk</PageTitle>
 
 <h1 class="text-center my-2">HelpDesk</h1>
 
 <div class="d-flex justify-content-end">
+    <button class="btn btn-success me-2" @onclick="ExportToExcel"
+            disabled="@(Tickets is null || Tickets?.Count == 0)">
+        Export to Excel
+    </button>
     <button class="btn btn-primary" @onclick="ShowCreateTicketModal">Add Ticket</button>
 </div>
 
@@ -22,7 +28,7 @@ else if (Tickets?.Count == 0)
 }
 else if (Tickets is not null)
 {
-    <table class="table">
+    <table class="table mt-4">
         <thead>
             <tr>
                 <th class="text-center">ID</th>
@@ -125,5 +131,19 @@ else if (Tickets is not null)
         }
 
         await InvokeAsync(StateHasChanged);
+    }
+
+    async Task ExportToExcel()
+    {
+        var request = await HelpDeskHttp.PostAsJsonAsync<List<TicketDTO>>("api/Tickets/ExportToExcel", Tickets);
+
+        if (request.IsSuccessStatusCode)
+        {
+            var response = await request.Content.ReadAsStreamAsync();
+
+            var streamRef = new DotNetStreamReference(stream: response);
+
+            await JS.InvokeVoidAsync("downloadFileFromStream", "Tickets.xlsx", streamRef);
+        }
     }
 }
