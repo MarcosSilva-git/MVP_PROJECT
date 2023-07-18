@@ -20,6 +20,23 @@ public class TicketsController : HelpDeskControllerBase
         _logger = logger;
     }
 
+    [HttpGet("GetAllTickets")]
+    public async Task<ActionResult<List<TicketDTO>>> GetAllTickets()
+    {
+        var tickets = await TicketService.GetAllTickets();
+        return Ok(tickets.Select(t => new TicketDTO(t)));
+    }
+
+    [HttpGet("TicketStatus")]
+    public OkObjectResult TicketStatus()
+    {
+        var ticketStatus = HelpDeskContext.TicketStatus
+            .Select(ts => new { ts.Id, Name = ts.Name.ToString() })
+            .ToArray();
+
+        return Ok(ticketStatus);
+    }
+
     [HttpPost]
     public ActionResult<TicketDTO> Create(TicketDTO ticket)
     {
@@ -27,11 +44,19 @@ public class TicketsController : HelpDeskControllerBase
         return Ok(new TicketDTO(newTicket));
     }
 
-    [HttpGet("GetAllTickets")]
-    public async Task<ActionResult<TicketDTO>> GetAllTickets() 
-    { 
-        var tickets = await TicketService.GetAllTickets();
-        return Ok(tickets.Select(t => new TicketDTO(t)));
+    [HttpPut]
+    public ActionResult<TicketDTO> Update(TicketDTO ticket)
+    {
+        try
+        {
+            var updatedTicket = TicketService.UpdateTicket(ticket);
+            return Ok(new TicketDTO(updatedTicket));
+        }
+        catch (KeyNotFoundException e)
+        {
+            _logger.LogInformation(e.Message);
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpDelete]
@@ -47,15 +72,5 @@ public class TicketsController : HelpDeskControllerBase
             _logger.LogInformation(e.Message);
             return BadRequest(e.Message);
         }
-    }
-
-    [HttpGet("TicketStatus")]
-    public OkObjectResult TicketStatus()
-    {
-        var ticketStatus = HelpDeskContext.TicketStatus
-            .Select(ts => new { ts.Id, Name = ts.Name.ToString() })
-            .ToArray();
-
-        return Ok(ticketStatus);
     }
 }

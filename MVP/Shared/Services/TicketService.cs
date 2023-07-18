@@ -23,6 +23,16 @@ public class TicketService : IHelpDeskService
         return tickets;
     }
 
+    private Ticket GetTicketById(int id)
+    {
+        var ticket = HelpDeskContext.Tickets.Where(t => t.Id == id).FirstOrDefault();
+
+        if (ticket == null)
+            throw new KeyNotFoundException("Nenhum ticket foi encontrado.");
+
+        return ticket;
+    }
+
     public Ticket CreateNewTicket(TicketDTO ticket)
     {
         var newTicket = new Ticket()
@@ -40,14 +50,25 @@ public class TicketService : IHelpDeskService
 
     public Ticket DeleteTicket(int id)
     {
-        var ticket = HelpDeskContext.Tickets.Where(t  => t.Id == id).FirstOrDefault();
-
-        if (ticket == null)
-            throw new KeyNotFoundException("Nenhum ticket foi encontrado.");
+        var ticket = GetTicketById(id);
 
         var deletedTicket = HelpDeskContext.Tickets.Remove(ticket).Entity;
         HelpDeskContext.SaveChanges();
 
         return deletedTicket;
+    }
+
+    public Ticket UpdateTicket(TicketDTO ticket)
+    {
+        var findedTicket = GetTicketById(ticket.Id);
+
+        findedTicket.Title = ticket.Title;
+        findedTicket.Description = ticket.Description;
+        findedTicket.StatusId = ticket.StatusId;
+
+        HelpDeskContext.Tickets.Update(findedTicket);
+        HelpDeskContext.SaveChanges();
+
+        return findedTicket;
     }
 }
